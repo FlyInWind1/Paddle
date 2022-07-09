@@ -151,6 +151,11 @@ set(COMMON_FLAGS
     ${fsanitize}
 )
 
+if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.2)
+    set(COMMON_FLAGS ${COMMON_FLAGS}
+        -Wno-error)
+endif ()
+
 if(WITH_IPU)
     set(COMMON_FLAGS ${COMMON_FLAGS} 
         -Wno-sign-compare # Warnings in Popart
