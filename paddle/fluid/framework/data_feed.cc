@@ -574,7 +574,7 @@ void InMemoryDataFeed<T>::LoadIntoMemoryFromSo() {
     (defined PADDLE_WITH_PSLIB)
   VLOG(3) << "LoadIntoMemoryFromSo() begin, thread_id=" << thread_id_;
   int buf_len = 1024 * 1024 * 10;
-  char* buf = (char*)malloc(buf_len + 10);
+  char* buf = reinterpret_cast<char*>(malloc(buf_len + 10));
   auto ps_gpu_ptr = PSGPUWrapper::GetInstance();
 
   paddle::framework::CustomParser* parser =
@@ -1536,13 +1536,13 @@ void PrivateInstantDataFeed<T>::PutToFeedVec() {
 
     if (type[0] == 'f') {  // float
       const auto& feasign = ins_vec_[i].GetFloatData();
-      float* tensor_ptr =
-          feed_vec_[i]->mutable_data<float>({total_instance, 1}, this->place_);
+      float* tensor_ptr = feed_vec_[i]->template mutable_data<float>(
+          {total_instance, 1}, this->place_);
       CopyToFeedTensor(tensor_ptr, &feasign[0], total_instance * sizeof(float));
     } else if (type[0] == 'u') {  // uint64
       // no uint64_t type in paddlepaddle
       const auto& feasign = ins_vec_[i].GetUint64Data();
-      int64_t* tensor_ptr = feed_vec_[i]->mutable_data<int64_t>(
+      int64_t* tensor_ptr = feed_vec_[i]->template mutable_data<int64_t>(
           {total_instance, 1}, this->place_);
       CopyToFeedTensor(
           tensor_ptr, &feasign[0], total_instance * sizeof(int64_t));
