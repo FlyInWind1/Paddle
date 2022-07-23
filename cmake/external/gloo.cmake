@@ -27,6 +27,11 @@ SET(GLOO_LIBRARIES     "${GLOO_INSTALL_DIR}/lib/libgloo.a" CACHE FILEPATH "gloo 
 
 INCLUDE_DIRECTORIES(${GLOO_INCLUDE_DIR})
 
+if(UNIX)
+  set(GLOO_PATCH_COMMAND sh ${PADDLE_SOURCE_DIR}/patches/gloo/device_patch.sh
+          ${GLOO_SOURCE_DIR})
+endif()
+
 if(WITH_ASCEND OR WITH_ASCEND_CL)
   ExternalProject_Add(
       ${GLOO_PROJECT}
@@ -37,6 +42,7 @@ if(WITH_ASCEND OR WITH_ASCEND_CL)
       PREFIX                "${GLOO_PREFIX_DIR}"
       UPDATE_COMMAND        ""
       CONFIGURE_COMMAND     ""
+      PATCH_COMMAND ${GLOO_PATCH_COMMAND}
       BUILD_COMMAND         mkdir -p ${GLOO_SOURCE_DIR}/build
           && cd ${GLOO_SOURCE_DIR}/build && cmake .. -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} && make
           && mkdir -p ${GLOO_LIBRARY_DIR} ${GLOO_INCLUDE_DIR}/gloo
